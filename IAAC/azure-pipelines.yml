@@ -1,0 +1,109 @@
+trigger:
+- none
+
+pool:
+  name: Afreen-agent-pool
+
+variables:
+  workingDir: '$(System.DefaultWorkingDirectory)/environment/dev'
+
+steps:
+
+# Install Dependencies
+- task: CmdLine@2
+  displayName: Install Dependencies
+  inputs:
+    script: |
+      sudo apt-get update
+      sudo apt-get install -y unzip curl
+
+# Install Terraform
+- task: TerraformInstaller@1
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: 'latest'
+
+# Install TFLint
+- task: CmdLine@2
+  displayName: Install TFLint
+  inputs:
+    script: |
+      curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      tflint --version
+
+# Install Tfsec
+- task: CmdLine@2
+  displayName: Install Tfsec
+  inputs:
+    script: |
+      curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+      tfsec --version
+
+# Terraform Init
+- task: TerraformTask@5
+  displayName: Terraform Init
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(workingDir)'
+    backendServiceArm: 'ServiceConnectionReg'
+    backendAzureRmStorageAccountName: 'serviceconnstorageac1'
+    backendAzureRmContainerName: 'teraformpipeline'
+    backendAzureRmKey: 'pipeline.tfstate'
+
+# Terraform Format Check
+# - task: CmdLine@2
+#   displayName: Terraform Fmt Check
+#   inputs:
+#     script: |
+#       cd $(workingDir)
+#       terraform fmt -check -recursive
+
+# Terraform Validate
+- task: TerraformTask@5
+  displayName: Terraform Validate
+  inputs:
+    provider: 'azurerm'
+    command: 'validate'
+    workingDirectory: '$(workingDir)'
+
+# TFLint
+# - task: CmdLine@2
+#   displayName: TFLint Scan
+#   inputs:
+#     script: |
+#       cd $(workingDir)
+#       tflint
+
+# # Tfsec
+# - task: CmdLine@2
+#   displayName: Tfsec Security Scan
+#   inputs:
+#     script: |
+#       cd $(workingDir)
+#       tfsec .
+
+# Terraform Plan
+- task: TerraformTask@5
+  displayName: Terraform Plan
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: '$(workingDir)'
+    environmentServiceNameAzureRM: 'ServiceConnectionReg'
+
+# Terraform Apply
+# - task: TerraformTask@5
+#   displayName: Terraform Apply
+#   inputs:
+#     provider: 'azurerm'
+#     command: 'apply'
+#     workingDirectory: '$(workingDir)'
+#     environmentServiceNameAzureRM: 'ServiceConnectionReg'
+- task: TerraformTask@5
+  displayName: Terraform destroy
+  inputs:
+    provider: 'azurerm'
+    command: 'destroy'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/environment/dev/'
+    environmentServiceNameAzureRM: 'ServiceConnectionReg'

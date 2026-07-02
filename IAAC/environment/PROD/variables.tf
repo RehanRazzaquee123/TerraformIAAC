@@ -1,0 +1,14 @@
+variable "rgs" {}
+variable "vnets" {}
+variable "subnets" {}
+variable "nsgs" {}
+variable "pip" {}
+variable "nic1" {}
+variable "nic2" {}
+variable "vm1name" {}
+variable "vm2name" {}
+variable "osdiskname" {}
+variable "datadiskname" {}
+variable "nic_nsg1" {}
+variable "nic_nsg2" {}
+variable "peering" {}
