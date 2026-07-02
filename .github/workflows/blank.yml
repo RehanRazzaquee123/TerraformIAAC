@@ -38,4 +38,8 @@ jobs:
               "clientSecret": "${{secrets.clientSecret}}"
             }
 
+      - name: Verify Login to Azure
+        run:
+          az group -list
+
 
