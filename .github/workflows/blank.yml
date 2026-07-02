@@ -54,6 +54,24 @@ jobs:
            ./install_linux.sh
            tflint --version
 
+      - name: Install Tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+          tfsec --version
+
+      - name: Terraform Init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="storage_account_name=serviceconnstorageac1" \
+            -backend-config="container_name=teraformpipeline" \
+            -backend-config="key=pipeline.tfstate" \
+            -backend-config="use_azuread_auth=true"
+
+      - name: Terraform Validate
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform validate
+
           
 
 
