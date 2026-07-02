@@ -40,6 +40,6 @@ jobs:
 
       - name: Verify Login to Azure
         run:
-          az group -list
+          az group list
 
 
