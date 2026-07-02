@@ -14,6 +14,8 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    environment: dev
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:  
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -30,10 +32,10 @@ jobs:
         with:
           creds: |
             {
-              "clientId": "ad128e01-6a61-45eb-bfc3-ecbc9a6effc0",
-              "tenantId": "c0deb48d-3915-4822-8bb8-2de6950b5302",
-              "subscriptionId": "3e435172-5e9c-4c87-9f88-72d810198f70",
-              "clientSecret": "4qN8Q~wuaLpX3HkCa0DQSyskR7eOu7-YoXlCCdwl"
+              "clientId": "${{secrets.clientId}}",
+              "tenantId": "${{secrets.tenantId}}",
+              "subscriptionId": "${{secrets.subscriptionId}}",
+              "clientSecret": "${{secrets.clientSecret}}"
             }
 
 
