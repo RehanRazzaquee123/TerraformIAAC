@@ -1,17 +1,17 @@
 rgs = {
   rg1 = {
     name     = "rg-tf1"
-    location = "West Europe"
+    location = "Central India"
   }
   rg2 = {
     name     = "rg-tf2"
-    location = "West Europe"
+    location = "Central India"
   }
 }
 vnets = {
   vnet1 = {
     name          = "vnet1"
-    location      = "West Europe"
+    location      = "Central India"
     rg_key        = "rg1"
     address_space = ["10.0.0.0/16"]
 
@@ -26,7 +26,7 @@ vnets = {
 nsgs = {
   nsg1 = {
     name     = "nsg1"
-    location = "West Europe"
+    location = "Central India"
     rg_key   = "rg1"
   }
   nsg2 = {
@@ -52,21 +52,31 @@ subnets = {
 
 nic_nsg1 = {
   nsg_key = "nsg1"
+  pip_key = "pip1"
 }
 nic_nsg2 = {
   nsg_key = "nsg2"
+  pip_key = "pip2"
 }
-
-pip = {
-  name              = "pip-test"
-  location          = "West Europe"
-  rg_key            = "rg2"
-  allocation_method = "Static"
-  sku               = "Standard"
+pips = {
+  pip1 = {
+    name              = "pip-test1"
+    location          = "Central India"
+    rg_key            = "rg1"
+    allocation_method = "Static"
+    sku               = "Standard"
+  }
+  pip2 = {
+    name              = "pip-test2"
+    location          = "Central India"
+    rg_key            = "rg2"
+    allocation_method = "Static"
+    sku               = "Standard"
+  }
 }
 nic1 = {
   name              = "web-nic"
-  location          = "West Europe"
+  location          = "Central India"
   rg_key            = "rg1"
   public_ip_enabled = true
 
@@ -90,9 +100,9 @@ nic2 = {
 
 vm1name = {
   name           = "web-vm"
-  location       = "West Europe"
+  location       = "Central India"
   rg_key         = "rg1"
-  vm_size        = "Standard_D2s_v3"
+  vm_size        = "Standard_D2ls_v5"
   admin_username = "testadmin"
   admin_password = "Password1234!"
 }
@@ -107,7 +117,7 @@ vm2name = {
   name           = "app-vm"
   location       = "Central India"
   rg_key         = "rg2"
-  vm_size        = "Standard_B2als_v2"
+  vm_size        = "Standard_D2ls_v5"
   admin_username = "testadmin"
   admin_password = "Password1234!"
 }
@@ -144,4 +154,10 @@ http = {
     rg_key  = "rg2"
     nsg_key = "nsg2"
   }
+}
+cr = {
+  crname        = "crrehan2202"
+  location      = "Central India"
+  sku           = "Basic"
+  admin_enabled = false
 }

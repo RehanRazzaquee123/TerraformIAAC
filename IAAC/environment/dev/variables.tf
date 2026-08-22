@@ -2,7 +2,7 @@ variable "rgs" {}
 variable "vnets" {}
 variable "subnets" {}
 variable "nsgs" {}
-variable "pip" {}
+#variable "pip" {}
 variable "nic1" {}
 variable "nic2" {}
 variable "vm1name" {}
@@ -14,3 +14,5 @@ variable "nic_nsg2" {}
 variable "peering" {}
 variable "ssh" {}
 variable "http" {}
+variable "pips" {}
+variable "cr" {}

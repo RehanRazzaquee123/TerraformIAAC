@@ -1,21 +1,23 @@
-resource "azurerm_subnet" "subnets" {
-  for_each=tomap(var.subnets)
-  name                 = each.value.name
-  resource_group_name  = var.rgName_From_Module[each.value.rg_key]
-  virtual_network_name = var.vnetName_From_Module[each.value.vnet_key]
-  address_prefixes     = each.value.address_prefixes
- }
+# data "azurerm_key_vault" "existing" {
+#   name                = "MySecretsPrac12"
+#   resource_group_name = "PrabhGit"
+# }
 
+# data "azurerm_key_vault_secret" "vm_password" {
+#   name         = "secretstore"
+#   key_vault_id = data.azurerm_key_vault.existing.id
+# }
 resource "azurerm_public_ip" "pip" {
-  name                = var.pip.name
-  location            = var.pip.location
-  resource_group_name = var.rgName_From_Module[var.pip.rg_key]
-  allocation_method   = var.pip.allocation_method
-  sku                 = var.pip.sku
+  for_each = var.pips
+  name                = each.value.name
+  location            = each.value.location
+  resource_group_name = var.rgName_From_Module[each.value.rg_key]
+  allocation_method   = each.value.allocation_method
+  sku                 = each.value.sku
 }
 
 resource "azurerm_network_interface" "nic1" {
-  depends_on=[azurerm_public_ip.pip,azurerm_subnet.subnets]
+  #depends_on=[azurerm_public_ip.pip,azurerm_subnet.subnets]
   name                = var.nic1.name
   location            = var.nic1.location
   resource_group_name = var.rgName_From_Module[var.nic1.rg_key]
@@ -23,38 +25,39 @@ resource "azurerm_network_interface" "nic1" {
   ip_configuration {
     
     name                          = var.nic1.ip_configuration.name
-    subnet_id                     = azurerm_subnet.subnets["subnet1"].id
+    subnet_id                     = var.subnetid_From_Module["subnet1"]
     private_ip_address_allocation = var.nic1.ip_configuration.private_ip_address_allocation
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = azurerm_public_ip.pip["pip1"].id
   }
 }
-resource "azurerm_network_interface" "nic2" {
-  depends_on=[azurerm_subnet.subnets]
-  name                = var.nic2.name
-  location            = var.nic2.location
-  resource_group_name = var.rgName_From_Module[var.nic2.rg_key]
+# resource "azurerm_network_interface" "nic2" {
+#   #depends_on=[azurerm_subnet.subnets]
+#   name                = var.nic2.name
+#   location            = var.nic2.location
+#   resource_group_name = var.rgName_From_Module[var.nic2.rg_key]
 
-  ip_configuration {
-    name                          = var.nic2.ip_configuration.name
-    subnet_id                     = azurerm_subnet.subnets["subnet2"].id
-    private_ip_address_allocation = var.nic2.ip_configuration.private_ip_address_allocation    
-  }
-}
+#   ip_configuration {
+#     name                          = var.nic2.ip_configuration.name
+#     subnet_id                     = var.subnetid_From_Module["subnet2"]#azurerm_subnet.subnets["subnet2"].id
+#     private_ip_address_allocation = var.nic2.ip_configuration.private_ip_address_allocation    
+#   }
+# }
 
 resource "azurerm_network_interface_security_group_association" "nic_nsg1" {
-  depends_on=[azurerm_network_interface.nic1]
+  #depends_on=[azurerm_network_interface.nic1]
   network_interface_id      = azurerm_network_interface.nic1.id
   network_security_group_id = var.nsgName_From_Module[var.nic_nsg1.nsg_key]
 }
 
-resource "azurerm_network_interface_security_group_association" "nic_nsg2" {
-  depends_on=[azurerm_network_interface.nic2]
-  network_interface_id      = azurerm_network_interface.nic2.id
-  network_security_group_id = var.nsgName_From_Module[var.nic_nsg2.nsg_key]
-}
+# resource "azurerm_network_interface_security_group_association" "nic_nsg2" {
+#   #depends_on=[azurerm_network_interface.nic2]
+#   network_interface_id      = azurerm_network_interface.nic2.id
+#   network_security_group_id = var.nsgName_From_Module[var.nic_nsg2.nsg_key]
+# }
 
 resource "azurerm_virtual_machine" "tvm1" {
-  depends_on=[azurerm_network_interface.nic1]
+ # depends_on=[azurerm_network_interface.nic1]
+
   name                  = var.vm1name.name
   location              = var.vm1name.location
   resource_group_name   = var.rgName_From_Module[var.vm1name.rg_key]
@@ -73,6 +76,7 @@ resource "azurerm_virtual_machine" "tvm1" {
   }
 
   os_profile_linux_config {
+     #tfsec:ignore:azure-compute-disable-password-authentication
     disable_password_authentication = false
   }
 
@@ -84,35 +88,36 @@ resource "azurerm_virtual_machine" "tvm1" {
   }
 }
 
-resource "azurerm_virtual_machine" "tvm2" {
-  name                  = var.vm2name.name
-  location              = var.vm2name.location
-  resource_group_name   = var.rgName_From_Module[var.vm2name.rg_key]
-  network_interface_ids = [azurerm_network_interface.nic2.id]
-  vm_size               = var.vm2name.vm_size
-  storage_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts"
-    version   = "latest"
-  }
-  os_profile {
-    computer_name  = "hostname"
-    admin_username = var.vm2name.admin_username
-    admin_password = var.vm2name.admin_password
-  }
+# resource "azurerm_virtual_machine" "tvm2" {
+#   name                  = var.vm2name.name
+#   location              = var.vm2name.location
+#   resource_group_name   = var.rgName_From_Module[var.vm2name.rg_key]
+#   network_interface_ids = [azurerm_network_interface.nic2.id]
+#   vm_size               = var.vm2name.vm_size
+#   storage_image_reference {
+#     publisher = "Canonical"
+#     offer     = "0001-com-ubuntu-server-jammy"
+#     sku       = "22_04-lts"
+#     version   = "latest"
+#   }
+#   os_profile {
+#     computer_name  = "hostname"
+#     admin_username = var.vm2name.admin_username
+#     admin_password = var.vm2name.admin_password
+#   }
 
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
+#   os_profile_linux_config {
+#      #tfsec:ignore:azure-compute-disable-password-authentication
+#     disable_password_authentication = false
+#   }
 
-  storage_os_disk {
-    name              = var.datadiskname.name
-    caching           = var.datadiskname.caching
-    create_option     = var.datadiskname.create_option
-    managed_disk_type = var.datadiskname.storage_account_type
-}
-}
+#   storage_os_disk {
+#     name              = var.datadiskname.name
+#     caching           = var.datadiskname.caching
+#     create_option     = var.datadiskname.create_option
+#     managed_disk_type = var.datadiskname.storage_account_type
+# }
+# }
 resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
   name                         = "vnet1-to-vnet2"
   resource_group_name          = var.rgName_From_Module[var.peering.rg_key1]

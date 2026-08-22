@@ -14,9 +14,17 @@ module "NSGTest" {
   ssh                = var.ssh
   http               = var.http
 }
+module "Subnet" {
+  source               = "../../modules/azurerm_subnet_network"
+  subnets              = var.subnets
+  rgName_From_Module   = module.RGTest.rg_names
+  vnetName_From_Module = module.VnetTest.rg_vnets
+}
 module "NICCardTest" {
   source               = "../../modules/azurerm_nic_card"
-  pip                  = var.pip
+  subnetid_From_Module = module.Subnet.rg_subnetids
+  vnetid_From_Module   = module.VnetTest.rg_vnetids
+  pips                 = var.pips
   rgName_From_Module   = module.RGTest.rg_names
   nic1                 = var.nic1
   nic2                 = var.nic2
@@ -30,5 +38,17 @@ module "NICCardTest" {
   nic_nsg2             = var.nic_nsg2
   nsgName_From_Module  = module.NSGTest.rg_nsgs
   peering              = var.peering
-  vnetid_From_Module   = module.VnetTest.rg_vnetids
+}
+module "AppGateway" {
+  source               = "../../modules/azurerm_application_gateway"
+  subnetid_From_Module = module.Subnet.rg_subnetids
+  pip_From_Module      = module.NICCardTest.pipids
+  nic_private_ip      = module.NICCardTest.nic_private_ip
+}
+module "ContainerRegistry" {
+  depends_on         = [module.RGTest]
+  source             = "../../modules/azurerm_container_registry"
+  cr                 = var.cr
+  rgName_From_Module = module.RGTest.rg_names
+
 }

@@ -1,9 +1,9 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "PrabhGit"
-    storage_account_name = "storageaccprabh"
-    container_name       = "teraformpipeline"
-    key                  = "pipeline.tfstate"
+    resource_group_name  = "mera-rg"
+    storage_account_name = "storageb18"
+    container_name       = "augcontainer"
+    key                  = "dev/pipeline.tfstate"
   }
   required_providers {
     azurerm = {
@@ -15,5 +15,5 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "3e435172-5e9c-4c87-9f88-72d810198f70"
+  subscription_id = "ee2ae788-9582-4219-9666-16d19b8ebd6e"
 }
