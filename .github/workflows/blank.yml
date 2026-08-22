@@ -72,6 +72,10 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         run: terraform validate
 
+      - name: Terraform Plan
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform plan
+
           
 
 
