@@ -63,8 +63,8 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         run: |
           terraform init \
-            -backend-config="storage_account_name=serviceconnstorageac1" \
-            -backend-config="container_name=teraformpipeline" \
+            -backend-config="storage_account_name=storageb18" \
+            -backend-config="container_name=augcontainer" \
             -backend-config="key=pipeline.tfstate" \
             -backend-config="use_azuread_auth=true"
 
